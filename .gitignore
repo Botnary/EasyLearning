@@ -1,8 +1,12 @@
 # Package Meta #
 .idea/
+<<<<<<< HEAD
 *.class
 
 # Package Files #
 *.jar
 *.war
 *.ear
+=======
+gen/
+>>>>>>> cbbce16663e03b84de7ce832d8a761fc28ef3cf5
