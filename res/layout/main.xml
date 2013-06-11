@@ -9,5 +9,11 @@
             android:layout_height="wrap_content"
             android:text="Hello World, MyActivity"
             />
+    <ProgressBar
+            android:id="@+id/myProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@android:style/Widget.ProgressBar.Small"
+            android:layout_marginRight="5dp" />
 </LinearLayout>
 

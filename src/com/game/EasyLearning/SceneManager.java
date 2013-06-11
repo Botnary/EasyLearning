@@ -2,13 +2,18 @@ package com.game.EasyLearning;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
+import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlas;
 import org.andengine.opengl.texture.atlas.bitmap.BitmapTextureAtlasTextureRegionFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.TiledTextureRegion;
 import org.andengine.ui.activity.BaseGameActivity;
 import android.util.Log;
 
@@ -23,12 +28,35 @@ public class SceneManager {
     private BaseGameActivity activity;
     private Engine engine;
     private Camera camera;
-    private BitmapTextureAtlas splashTA, menuTA1,menuTA2,menuTA3,menuTA4, menuBgTA;
-    private ITextureRegion splashTR, menuGame1TR, menuGame2TR,menuGame3TR,menuGame4TR, menuBgTR;
-    private Scene splashScene, gameScene, menuScene;
+    private AnimalBabiesGame animalBabiesGame;
+    private BitmapTextureAtlas
+            splashTA,
+            menuTA1,
+            menuTA2,
+            menuTA3,
+            menuTA4,
+            menuBgTA,
+            loaderTA,
+            texBanana;
+    private ITextureRegion
+            splashTR,
+            menuGame1TR,
+            menuGame2TR,
+            menuGame3TR,
+            menuGame4TR,
+            menuBgTR,
+            loaderTR;
+    private TiledTextureRegion regBanana;
+    private Scene
+            splashScene,
+            menuScene,
+            animalBabiesScene,
+            matchObjectScene,
+            handWritingScene,
+            learnAlphabetScene;
 
     public enum AllScenes {
-        SPLASH, MENU, GAME
+        SPLASH, MENU, ANIMALS_BABIES, MATCH_OBJECT
     }
 
     public SceneManager(BaseGameActivity act, Engine eng, Camera cam) {
@@ -36,18 +64,27 @@ public class SceneManager {
         this.activity = act;
         this.engine = eng;
         this.camera = cam;
+        this.animalBabiesGame = new AnimalBabiesGame(this, act, eng, cam);
     }
 
     public void loadSplashResources() {
-        /*splashTA = new BitmapTextureAtlas(this.activity.getTextureManager(),
-                256, 256);
-        splashTR = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
-                splashTA, this.activity, "beast.png", 0, 0);
-        splashTA.load();*/
+        BitmapTextureAtlasTextureRegionFactory.setAssetBasePath("gfx/");
+
+        texBanana = new BitmapTextureAtlas(this.activity.getTextureManager(), 256, 128, TextureOptions.BILINEAR_PREMULTIPLYALPHA);
+        regBanana = BitmapTextureAtlasTextureRegionFactory.createTiledFromAsset(texBanana, this.activity.getAssets(),"spr_banana.png", 0, 0, 4, 2);
+        texBanana.load();
+
+        splashTA = new BitmapTextureAtlas(this.activity.getTextureManager(), 1600, 960);
+        splashTR = BitmapTextureAtlasTextureRegionFactory.createFromAsset(splashTA, activity, "bg_blue.gif", 0, 0);
+        splashTA.load();
+
+        loaderTA = new BitmapTextureAtlas(this.activity.getTextureManager(), 132, 132);
+        loaderTR = BitmapTextureAtlasTextureRegionFactory.createFromAsset(loaderTA, activity, "ajax-loader.gif", 0, 0);
+        loaderTA.load();
     }
 
-    public void loadGameResources() {
-
+    public void loadAnimalBabiesResources() {
+        animalBabiesGame.loadResources();
     }
 
     public void loadMenuResources() {
@@ -62,19 +99,12 @@ public class SceneManager {
                 menuBgTA, this.activity, "bg_menu.gif", 0, 0);
         menuGame1TR = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
                 menuTA1, this.activity, "animal_babies.png", 0, 0);
-        //menuGame1TR.setTextureSize(297,66);
-
         menuGame2TR = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
                 menuTA2, this.activity, "match_object.png", 0, 0);
-        //menuGame2TR.setTextureSize(297,66);
-
         menuGame3TR = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
                 menuTA3, this.activity, "hand_writing.png", 0, 0);
-        //menuGame3TR.setTextureSize(297,66);
-
         menuGame4TR = BitmapTextureAtlasTextureRegionFactory.createFromAsset(
                 menuTA4, this.activity, "learn_alphabet.png", 0, 0);
-        //menuGame4TR.setTextureSize(297,66);
 
         menuTA1.load();
         menuTA2.load();
@@ -87,12 +117,22 @@ public class SceneManager {
     public Scene createSplashScene() {
         splashScene = new Scene();
         splashScene.setBackground(new Background(1, 1, 1));
-        Log.d("createSplashScene","Method called");
-        Sprite icon = new Sprite(0, 0, splashTR,
+
+        Sprite bg = new Sprite(0,0,splashTR,engine.getVertexBufferObjectManager());
+
+        Sprite loader = new Sprite(0, 0, loaderTR,
                 engine.getVertexBufferObjectManager());
-        icon.setPosition((camera.getWidth() - icon.getWidth()) / 2,
-                (camera.getHeight() - icon.getHeight()) / 2);
-        splashScene.attachChild(icon);
+        loader.setPosition((camera.getWidth() - loader.getWidth()) / 2,
+                (camera.getHeight() - loader.getHeight()) / 2);
+
+        AnimatedSprite sprBanana = new AnimatedSprite(0,0,regBanana,engine.getVertexBufferObjectManager());
+        sprBanana.animate(100);
+        sprBanana.setPosition((camera.getWidth() - loader.getWidth()) / 2,
+                (camera.getHeight() - loader.getHeight()) / 2);
+
+        splashScene.attachChild(bg);
+        splashScene.attachChild(sprBanana);
+        //splashScene.attachChild(loader);
         return splashScene;
     }
 
@@ -104,13 +144,21 @@ public class SceneManager {
                 engine.getVertexBufferObjectManager());
 
         Sprite menu1 = new Sprite(0, 0, menuGame1TR,
-                engine.getVertexBufferObjectManager()){
+                engine.getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
                                          final float pTouchAreaLocalX,
                                          final float pTouchAreaLocalY) {
-                System.out.println(String.format("clicked %fx%f", pSceneTouchEvent.getX(), pSceneTouchEvent.getY()));
-                //setCurrentScene(AllScenes.SPLASH);
+                setSpriteAlpha(this);
+                engine.registerUpdateHandler(new TimerHandler(1f,
+                        new ITimerCallback() {
+
+                            @Override
+                            public void onTimePassed(TimerHandler pTimerHandler) {
+                                engine.unregisterUpdateHandler(pTimerHandler);
+                                setCurrentScene(AllScenes.ANIMALS_BABIES);
+                            }
+                        }));
                 return true;
             }
         };
@@ -119,13 +167,13 @@ public class SceneManager {
                 70);
 
         Sprite menu2 = new Sprite(0, 0, menuGame2TR,
-                engine.getVertexBufferObjectManager()){
+                engine.getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
                                          final float pTouchAreaLocalX,
                                          final float pTouchAreaLocalY) {
-                System.out.println(String.format("clicked %fx%f", pSceneTouchEvent.getX(), pSceneTouchEvent.getY()));
-                //setCurrentScene(AllScenes.SPLASH);
+                setSpriteAlpha(this);
+                setCurrentScene(AllScenes.MATCH_OBJECT);
                 return true;
             }
         };
@@ -133,13 +181,12 @@ public class SceneManager {
                 140);
 
         Sprite menu3 = new Sprite(0, 0, menuGame3TR,
-                engine.getVertexBufferObjectManager()){
+                engine.getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
                                          final float pTouchAreaLocalX,
                                          final float pTouchAreaLocalY) {
-                System.out.println(String.format("clicked %fx%f", pSceneTouchEvent.getX(), pSceneTouchEvent.getY()));
-                //setCurrentScene(AllScenes.SPLASH);
+                setSpriteAlpha(this);
                 return true;
             }
         };
@@ -147,34 +194,19 @@ public class SceneManager {
                 208);
 
         Sprite menu4 = new Sprite(0, 0, menuGame4TR,
-                engine.getVertexBufferObjectManager()){
+                engine.getVertexBufferObjectManager()) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
                                          final float pTouchAreaLocalX,
                                          final float pTouchAreaLocalY) {
-                System.out.println(String.format("clicked %fx%f", pSceneTouchEvent.getX(), pSceneTouchEvent.getY()));
-                //setCurrentScene(AllScenes.SPLASH);
+                setSpriteAlpha(this);
                 return true;
             }
         };
+
         menu4.setPosition((camera.getWidth() - menu4.getWidth()) / 2,
                 276);
-        /*Sprite icon = new Sprite(0, 0, splashTR,
-                engine.getVertexBufferObjectManager()){
-            @Override
-            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent,
-                                         final float pTouchAreaLocalX,
-                                         final float pTouchAreaLocalY) {
-                this.setPosition(pSceneTouchEvent.getX() - this.getWidth() / 2, pSceneTouchEvent.getY() - this.getHeight() / 2);
-                System.out.println(String.format("clicked %fx%f", pSceneTouchEvent.getX(), pSceneTouchEvent.getY()));
-                setCurrentScene(AllScenes.SPLASH);
-                return true;
-            }
-        };
-        icon.setPosition((camera.getWidth() - icon.getWidth()) / 2,
-                (camera.getHeight() - icon.getHeight()) / 2);
-        menuScene.attachChild(icon);
-        menuScene.registerTouchArea(icon);*/
+
 
         menuScene.attachChild(menubg);
         menuScene.attachChild(menu1);
@@ -190,12 +222,22 @@ public class SceneManager {
 
     }
 
-    public Scene createGameScene() {
-        return null;
+    public Scene createAnimalsBabiesScene() {
+        animalBabiesGame.createScenes();
+        animalBabiesScene = animalBabiesGame.getHomeScene();
+        return animalBabiesScene;
     }
 
     public AllScenes getCurrentScene() {
         return currentScene;
+    }
+
+    public void setSpriteAlpha(Sprite sprite) {
+        if (sprite.getAlpha() == 0.5F) {
+            sprite.setAlpha(1);
+        } else {
+            sprite.setAlpha(0.5F);
+        }
     }
 
     public void setCurrentScene(AllScenes currentScene) {
@@ -207,10 +249,9 @@ public class SceneManager {
             case MENU:
                 engine.setScene(menuScene);
                 break;
-            case GAME:
-                engine.setScene(gameScene);
+            case ANIMALS_BABIES:
+                engine.setScene(animalBabiesScene);
                 break;
-
             default:
                 break;
         }

@@ -1,6 +1,9 @@
 package com.game.EasyLearning;
 
+import android.app.ProgressDialog;
 import android.hardware.SensorManager;
+import android.util.Log;
+import android.widget.ProgressBar;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -52,7 +55,7 @@ public class MainGameActivity extends BaseGameActivity {
         //loadGfx();
         //gameWords.loadResources();
         sceneManager = new SceneManager(this, mEngine, camera);
-        sceneManager.loadMenuResources();
+        sceneManager.loadSplashResources();
         pOnCreateResourcesCallback.onCreateResourcesFinished();
     }
 
@@ -63,7 +66,7 @@ public class MainGameActivity extends BaseGameActivity {
         physicsWorld = new PhysicsWorld(new Vector2(0, SensorManager.GRAVITY_EARTH), false);
         this.scene.registerUpdateHandler(physicsWorld);*/
 
-        pOnCreateSceneCallback.onCreateSceneFinished(sceneManager.createMenuScene());
+        pOnCreateSceneCallback.onCreateSceneFinished(sceneManager.createSplashScene());
     }
 
     @Override
@@ -82,18 +85,22 @@ public class MainGameActivity extends BaseGameActivity {
         //createWalls();
         scene.registerTouchArea(bgSprite);
         gameWords.populateScene("hello",mEngine,scene);*/
+        Log.d("onPopulateScene","Start");
         mEngine.registerUpdateHandler(new TimerHandler(3f,
                 new ITimerCallback() {
 
                     @Override
                     public void onTimePassed(TimerHandler pTimerHandler) {
+                        Log.d("onPopulateScene","Working");
                         mEngine.unregisterUpdateHandler(pTimerHandler);
-                        // TODO Auto-generated method stub
-                        //sceneManager.loadMenuResources();
-                        //sceneManager.createMenuScene();
-                        //sceneManager.setCurrentScene(SceneManager.AllScenes.MENU);
+                        sceneManager.loadAnimalBabiesResources();
+                        sceneManager.createAnimalsBabiesScene();
+                        sceneManager.loadMenuResources();
+                        sceneManager.createMenuScene();
+                        sceneManager.setCurrentScene(SceneManager.AllScenes.MENU);
                     }
                 }));
+        Log.d("onPopulateScene","End");
         pOnPopulateSceneCallback.onPopulateSceneFinished();
     }
 
