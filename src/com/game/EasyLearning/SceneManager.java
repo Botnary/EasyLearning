@@ -85,6 +85,7 @@ public class SceneManager {
 
     public void loadAnimalBabiesResources() {
         animalBabiesGame.loadResources();
+        animalBabiesGame.loadSounds();
     }
 
     public void loadMenuResources() {

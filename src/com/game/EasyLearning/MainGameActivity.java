@@ -46,8 +46,11 @@ public class MainGameActivity extends BaseGameActivity {
     public EngineOptions onCreateEngineOptions() {
         //gameWords = new GameWords(this);
         this.camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-        return new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
+
+        EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_FIXED,
                 new RatioResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), this.camera);
+        engineOptions.getAudioOptions().setNeedsSound(true);
+        return engineOptions;
     }
 
     @Override
